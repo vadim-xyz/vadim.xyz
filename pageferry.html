@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PageFerry – Move a Page from Staging to Production</title>
+<meta name="description" content="PageFerry ferries a single Gutenberg page, post, or custom post type from staging to production — content, media, taxonomies included. ZIP-first workflow, correct block-level attachment remapping.">
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --card: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --accent: #2271b1;
+    --accent2: #135e96;
+    --green: #008a20;
+    --amber: #b45309;
+    --soft: #f1f5f9;
+    --radius: 12px;
+    --max: 1080px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif; color: var(--ink); background: #fff; line-height: 1.6; }
+  a { color: var(--accent); }
+  header.nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { font-weight: 800; font-size: 20px; letter-spacing: -.02em; text-decoration: none; color: var(--ink); }
+  .brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 20px; align-items: center; font-size: 15px; }
+  .nav-links a { text-decoration: none; color: var(--ink); }
+  .btn.btn { display: inline-block; background: var(--accent); color: #fff; padding: 12px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 0; cursor: pointer; }
+  .btn:hover { background: var(--accent2); color: #fff; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.small { padding: 8px 14px; font-size: 14px; }
+  .hero { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); color: #fff; padding: 72px 0 64px; }
+  .hero h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.1; letter-spacing: -.03em; margin: 0 0 16px; }
+  .hero p.lead { font-size: 19px; color: #cbd5e1; max-width: 640px; margin: 0 0 28px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+  .badge { font-size: 13px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); padding: 4px 10px; border-radius: 999px; color: #e2e8f0; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-cta .btn.ghost { color: #fff; border-color: rgba(255,255,255,.3); }
+  .flow { display: flex; gap: 8px; align-items: center; margin-top: 36px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; color: #93c5fd; flex-wrap: wrap; }
+  section { padding: 56px 0; }
+  section.alt { background: var(--soft); }
+  h2 { font-size: 30px; letter-spacing: -.02em; margin: 0 0 8px; }
+  p.sub { color: var(--muted); margin: 0 0 32px; max-width: 700px; font-size: 17px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  section.alt .card { background: #fff; }
+  .card h3 { margin: 0 0 8px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: step; }
+  .step { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .step .n { display: inline-flex; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .step h3 { margin: 0 0 8px; }
+  .step p, .step code { font-size: 15px; }
+  .step code { background: var(--soft); padding: 2px 6px; border-radius: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; background: #fff; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  th { background: var(--bg); color: #fff; font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .yes { color: var(--green); font-weight: 700; }
+  .no { color: var(--muted); }
+  details { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
+  summary { font-weight: 650; cursor: pointer; }
+  details p { color: var(--muted); margin: 8px 0 0; font-size: 15px; }
+  .install { background: var(--bg); color: #e2e8f0; border-radius: var(--radius); padding: 28px; }
+  .install ol { margin: 0; padding-left: 20px; }
+  .install code { background: rgba(255,255,255,.1); padding: 2px 8px; border-radius: 6px; font-size: 14px; }
+  .changelog { font-size: 15px; }
+  .changelog h3 { margin: 24px 0 8px; }
+  .changelog ul { margin: 0; color: var(--muted); }
+  footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--muted); font-size: 14px; }
+  .cols { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  pre.pipeline { background: var(--bg); color: #93c5fd; padding: 20px; border-radius: var(--radius); overflow-x: auto; font-size: 13.5px; line-height: 1.7; }
+  @media (max-width: 800px) {
+    .grid3, .grid2, .steps { grid-template-columns: 1fr; }
+    .nav-links a.hide-m { display: none; }
+    section { padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#">Page<span>Ferry</span></a>
+    <nav class="nav-links">
+      <a class="hide-m" href="#how">How it works</a>
+      <a class="hide-m" href="#features">Features</a>
+      <a class="hide-m" href="#faq">FAQ</a>
+      <a class="hide-m" href="#changelog">Changelog</a>
+      <a class="btn small" href="#download">Get PageFerry</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Ferry a page from staging to production — media included.</h1>
+    <p class="lead">PageFerry exports a single Gutenberg page, post, or custom post type to a ZIP file on staging, then imports it on production with correct block-level attachment remapping. No full-DB overwrite. No broken images.</p>
+    <div class="badges">
+      <span class="badge">v1.1.0</span>
+      <span class="badge">WordPress 6.5 – 6.8</span>
+      <span class="badge">PHP 8.1+</span>
+      <span class="badge">Gutenberg-only</span>
+      <span class="badge">GPL-2.0-or-later</span>
+      <span class="badge">No accounts · No CDN · No phone-home</span>
+    </div>
+    <div class="hero-cta">
+      <a class="btn" href="#download">Download PageFerry</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <div class="flow">Export &nbsp;→&nbsp; ZIP (content + manifest + media) &nbsp;→&nbsp; Import &nbsp;→&nbsp; dedupe → remap → create / update</div>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="wrap">
+    <h2>The problem it solves</h2>
+    <p class="sub">The native WordPress exporter leaves image files behind. Full-site migrators overwrite live orders, customers, and fresh content. Manual copy/paste means re-uploading media and fixing references by hand.</p>
+    <div class="grid3">
+      <div class="card"><h3>Broken images after import</h3><p>The #1 complaint about WXR export: references come over, files don't. PageFerry bundles every used file into the ZIP.</p></div>
+      <div class="card"><h3>Fear of overwriting live data</h3><p>One page moves. Nothing else is touched — no database overwrite, no lost orders or comments.</p></div>
+      <div class="card"><h3>Duplicate media bloat</h3><p>SHA-256 content-hash dedup reuses byte-identical files instead of stacking another copy on every re-import.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">ZIP-first workflow. Works across hosts, firewalls, and client handoffs — no site-to-site pairing needed.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Export on staging</h3><p>Open the page → <code>PageFerry Export → Ferry this page</code> → download the ZIP (content + <code>pageferry-manifest.json</code> + media files).</p></div>
+      <div class="step"><div class="n">2</div><h3>Import on production</h3><p><code>Tools → PageFerry Import</code> → upload the ZIP → preview what will change → choose create-new or update-selected.</p></div>
+      <div class="step"><div class="n">3</div><h3>Confirm</h3><p>PageFerry dedupes media, remaps attachment IDs + URLs, preserves slug and taxonomies, snapshots the overwritten page, and writes a log row.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>What v1 does</h2>
+    <p class="sub">One perfect flow: a Gutenberg page + its media, moved correctly. Free scope is deliberately Gutenberg-only.</p>
+    <div class="grid3">
+      <div class="card"><h3>Block-level attachment remap</h3><p>Conservative scan of block attributes (any depth) + saved HTML. IDs and URLs rewritten at exact recorded slots — never raw number replacement.</p></div>
+      <div class="card"><h3>Hash-based media reuse</h3><p>SHA-256 index, always hash-verified on read. Identical bytes reuse the existing attachment; same name with different bytes uploads separately.</p></div>
+      <div class="card"><h3>Slug + taxonomies preserved</h3><p>Categories, tags, and custom taxonomies travel with hierarchy. Existing terms are reused; only new terms are created.</p></div>
+      <div class="card"><h3>Domain rewrite</h3><p>Staging URLs in content, excerpts, and custom fields are rewritten to production — URL-shaped occurrences only, prose untouched.</p></div>
+      <div class="card"><h3>Create or update in place</h3><p>Create-new lands as draft with a unique slug, or update a selected page of the same post type. Re-pushes don't duplicate.</p></div>
+      <div class="card"><h3>Backup + logs</h3><p>Every update snapshots prior content + meta (last 20 under Backups). Every import writes a plain-language log row (last 200).</p></div>
+      <div class="card"><h3>CPT + ACF post-meta blocks</h3><p>v1.1: block-editor CPTs and custom taxonomies ferry. ACF blocks storing fields in post meta (<code>usePostMeta</code>) ferry values with media-ID remap.</p></div>
+      <div class="card"><h3>Builder guard</h3><p>Elementor / Divi / Beaver / Bricks / WPBakery bundles are refused with a message naming the builder — never silently corrupted.</p></div>
+      <div class="card"><h3>Private by design</h3><p>No outbound requests, no CDN, no accounts or keys. All JS vendored locally. Nonce + capability checks on every handler.</p></div>
+    </div>
+    <h3 style="margin:32px 0 12px">Inside the bundle</h3>
+    <pre class="pipeline">pageferry-export.zip
+├── pageferry-manifest.json   manifest v1: post, tax_terms, media[], acf_post_meta[]
+└── media/
+    ├── 182-hero.jpg          original basenames preserved
+    └── 431-diagram.png</pre>
+  </div>
+</section>
+
+<section class="alt" id="compare">
+  <div class="wrap">
+    <h2>Why not the alternatives?</h2>
+    <p class="sub">PageFerry wins on correctness, simplicity, and trust — not feature count.</p>
+    <table>
+      <tr><th>Approach</th><th>What happens</th></tr>
+      <tr><td>Native Tools → Export/Import (WXR)</td><td>Exports references, leaves image files behind. <span class="no">Broken images.</span></td></tr>
+      <tr><td>Full-site migrators / host Push-to-Live</td><td>Overwrite the whole database. <span class="no">Live orders, users, and comments at risk.</span></td></tr>
+      <tr><td>Manual copy/paste</td><td>Re-upload media, re-enter meta/SEO/taxonomies by hand. <span class="no">Tedious, error-prone.</span></td></tr>
+      <tr><td><strong>PageFerry</strong></td><td>One page + its media, block-level remap, hash dedup, update-in-place. <span class="yes">Nothing else touched.</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>FAQ</h2>
+    <p class="sub">From the plugin readme.</p>
+    <details open><summary>Why was my Elementor page refused?</summary><p>PageFerry v1 imports Gutenberg pages only. The exporter detects page-builder meta and the importer refuses the bundle with a message naming the builder instead of silently corrupting the layout. Export as Gutenberg blocks (or rebuild in the block editor) and ferry again.</p></details>
+    <details><summary>How does media dedup work?</summary><p>Every file is hashed (SHA-256) at export. On import, PageFerry looks the hash up in its reuse index and verifies by re-hashing the existing attachment — a stale index row never reuses a deleted file. Identical bytes reuse the attachment; same filename with different bytes uploads separately.</p></details>
+    <details><summary>Update vs create — which is used?</summary><p>You choose on the import screen. Create-new inserts as a draft with a unique slug. Update-selected overwrites content, excerpt, terms, and featured image after snapshotting the prior version into Backups. Terms match by name; existing terms keep their current parents.</p></details>
+    <details><summary>Where is my pre-import backup?</summary><p>Tools → PageFerry Import → Backups. Each update stores the target's prior content and meta before writing anything (kept: last 20). The Logs tab links each update row to its backup key.</p></details>
+    <details><summary>The import says a file is too large. What now?</summary><p>Your host caps each upload. Bundles over the cap import file-by-file automatically — but one single asset over the cap cannot. Raise the PHP upload limit, or drop that asset and re-export. The error names the file.</p></details>
+    <details><summary>Does PageFerry ferry ACF block data?</summary><p>Blocks keeping field data in the block comment ferry like any other blocks. Blocks storing fields in post meta (usePostMeta, ACF PRO 6.3+) ferry values too: image/file/gallery IDs remap, URLs rewrite, the rest restores verbatim via the ACF API. Reference-type IDs (post/relationship/taxonomy/user) ferry verbatim — the export warns when they hold values.</p></details>
+  </div>
+</section>
+
+<section class="alt" id="download">
+  <div class="wrap">
+    <h2>Get PageFerry</h2>
+    <p class="sub">Requirements: WordPress 6.5+, PHP 8.1+, PHP zip extension (export side).</p>
+    <div class="install">
+      <ol>
+        <li>Upload <code>pageferry</code> to <code>/wp-content/plugins/</code>, activate.</li>
+        <li>Staging: open a page → PageFerry Export → Ferry this page → download ZIP.</li>
+        <li>Production: Tools → PageFerry Import → upload ZIP → Upload and preview → Confirm import.</li>
+        <li>Review the result under Tools → PageFerry Import → Logs (and Backups for updates).</li>
+      </ol>
+    </div>
+    <p style="margin-top:16px"><a class="btn" href="https://vadim.xyz/pageferry">Download v1.1.0</a>
+    <span style="color:var(--muted); font-size:14px; margin-left:12px">Free · GPL-2.0-or-later · by <a href="https://vadim.xyz">vadim.xyz</a></span></p>
+  </div>
+</section>
+
+<section id="changelog">
+  <div class="wrap changelog">
+    <h2>Changelog</h2>
+    <h3>1.1.0</h3>
+    <ul>
+      <li>Custom post types (block-editor) and custom taxonomies: export metabox on every Gutenberg-edited post type; importer recreates post type + term hierarchy (post type must be registered on production first).</li>
+      <li>ACF <code>usePostMeta</code> blocks: field values stored in post meta now ferry in the bundle and restore with media-ID remap and URL rewrite. Skipped values reported in the log row.</li>
+    </ul>
+    <h3>1.0.0</h3>
+    <ul>
+      <li>First release: single-ZIP Gutenberg page/post ferry — export with manifest, import with block-level remap, URL + domain rewrite, SHA-256 dedup, slug + category/tag preservation, create-new or update-selected, land-as-draft, backup plus log. Builder bundles refuse with a clear message.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap cols">
+    <div>PageFerry – Move a Page from Staging to Production · v1.1.0 · GPL-2.0-or-later</div>
+    <div>By <a href="https://vadim.xyz">vadim.xyz</a> · <a href="https://vadim.xyz/pageferry">Plugin URI</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
