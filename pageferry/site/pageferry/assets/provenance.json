@@ -1,0 +1,39 @@
+{
+  "recovery-full.webp": {
+    "origin": "Real canonical PageFerry1.3.5 recovery screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "d6e21de9f7575407ddb2c430dd47f256e25a8072af3b68bc28416968213f4379"
+  },
+  "recovery.webp": {
+    "origin": "Real canonical PageFerry1.3.5 recovery screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "2dacd5434549c1ee646f6ebabb3752c22995d7b5f2ef7b52e1815048df39ef10"
+  },
+  "result-full.webp": {
+    "origin": "Real canonical PageFerry1.3.5 result screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "3aad13a094da96007e6e2419a485c2b117a6fd353e4a482753b90185aa148521"
+  },
+  "result.webp": {
+    "origin": "Real canonical PageFerry1.3.5 result screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "40a6d2a2a41b8303282ff9775960a40f9db3d8334ab3098722abe2f327e3eb82"
+  },
+  "review-full.webp": {
+    "origin": "Real canonical PageFerry1.3.5 review screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "de95c715836ff7c87f05ff1dec9df71b276f3836511a245418a5c8ac161e56ca"
+  },
+  "review.webp": {
+    "origin": "Real canonical PageFerry1.3.5 review screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "1619ff7343ec7ac600170f111f124303e41c6f05ba9afc5f597fb4549dff624e"
+  },
+  "setup-full.webp": {
+    "origin": "Real canonical PageFerry1.3.5 setup screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "e568efe48f7d54835e9975adbb37e31ba380ff337d6cf7ddd664e8673258c91d"
+  },
+  "setup.webp": {
+    "origin": "Real canonical PageFerry1.3.5 setup screen; disposable WordPress6.8.3; sample coastal guide; captured by qa/capture-product.cjs, converted to WebP with browser canvas.",
+    "sha256": "d5de53528320e3762b48570a81158f7e5e5a0661210d56c91e1a938d3835648d"
+  },
+  "samplePhotoSources": {
+    "coast.jpg": "https://images.unsplash.com/photo-1518837695005-2083093ee35b",
+    "waves.jpg": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
+    "beach.jpg": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57"
+  }
+}
