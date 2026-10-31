@@ -6,7 +6,7 @@ const zoomButton = viewer?.querySelector('.viewer-zoom');
 function setZoom(zoomed) {
   imageViewport.classList.toggle('is-zoomed', zoomed);
   zoomButton.setAttribute('aria-pressed', String(zoomed));
-  zoomButton.querySelector('span').textContent = zoomed ? 'Fit screen' : 'Zoom in';
+  zoomButton.querySelector('span').textContent = zoomed ? 'Fit to screen' : 'Zoom in';
   imageViewport.scrollTo(0, 0);
 }
 
